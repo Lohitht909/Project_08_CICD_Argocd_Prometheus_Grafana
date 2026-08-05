@@ -39,14 +39,14 @@ pipeline {
     steps{
         script{
             echo 'docker image build'
-        sh 'sudo docker build -t lohith0720/nodejs:${BUILD_NUMBER} .'
+        sh 'docker build -t lohith0720/nodejs:${BUILD_NUMBER} .'
         }
     }
 }
 		
      stage('docker image scan'){
      steps{
-         sh "sudo trivy image lohith0720/nodejs:${BUILD_NUMBER}"
+         sh "trivy image lohith0720/nodejs:${BUILD_NUMBER}"
      }
  }		
 
