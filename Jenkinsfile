@@ -5,7 +5,7 @@ pipeline {
     stage('Checkout Code') {
         steps {
             echo 'scm git'
-            git branch: 'main', url: 'https://github.com/adarsh0331/Project_7.git'
+            git branch: 'main', url: 'https://github.com/Lohitht909/Project_08_CICD_Argocd_Prometheus_Grafana.git'
         }
     }
     
@@ -19,8 +19,8 @@ pipeline {
                           ${scannerHome}/bin/sonar-scanner \
                           -Dsonar.projectKey=my-devops-app \
                           -Dsonar.sources=. \
-                          -Dsonar.host.url=http://54.167.98.78:9000/ \
-                          -Dsonar.login=squ_1d768aa35185eaddb20ecdfbe32f0740c673b5f6
+                          -Dsonar.host.url=http://100.54.204.15:9000/ \
+                          -Dsonar.login=squ_7e10d062a797fc090c45adcb4ac4ebbb4870ef33
                        """
                     }
                 }
@@ -39,14 +39,14 @@ pipeline {
     steps{
         script{
             echo 'docker image build'
-        sh 'sudo docker build -t adarshbarkunta/nodejs:${BUILD_NUMBER} .'
+        sh 'sudo docker build -t lohith0720/nodejs:${BUILD_NUMBER} .'
         }
     }
 }
 		
      stage('docker image scan'){
      steps{
-         sh "sudo trivy image adarshbarkunta/nodejs:${BUILD_NUMBER}"
+         sh "sudo trivy image lohith0720/nodejs:${BUILD_NUMBER}"
      }
  }		
 
@@ -57,10 +57,10 @@ stage('Push image to ECR') {
             script {
                 sh '''
                   aws ecr get-login-password --region us-east-1 \
-                  | sudo docker login --username AWS --password-stdin 526344317172.dkr.ecr.us-east-1.amazonaws.com
+                  | sudo docker login --username AWS --password-stdin 483176634994.dkr.ecr.us-east-1.amazonaws.com
                   
-                  sudo docker tag adarshbarkunta/nodejs:${BUILD_NUMBER} 526344317172.dkr.ecr.us-east-1.amazonaws.com/nodejs:${BUILD_NUMBER}
-                  sudo docker push 526344317172.dkr.ecr.us-east-1.amazonaws.com/nodejs:${BUILD_NUMBER}
+                  sudo docker tag lohith0720/nodejs:${BUILD_NUMBER} 483176634994.dkr.ecr.us-east-1.amazonaws.com/nodejs:${BUILD_NUMBER}
+                  sudo docker push 483176634994.dkr.ecr.us-east-1.amazonaws.com/nodejs:${BUILD_NUMBER}
                 '''
             }
         }
@@ -69,8 +69,8 @@ stage('Push image to ECR') {
        stage('Update Deployment File') {
 		
 		 environment {
-            GIT_REPO_NAME = "Project_7"
-            GIT_USER_NAME = "adarsh0331"
+            GIT_REPO_NAME = "Project_8"
+            GIT_USER_NAME = "lohitht909"
         }
 		
             steps {
@@ -78,11 +78,11 @@ stage('Push image to ECR') {
 				withCredentials([string(credentialsId: 'githubtoken', variable: 'githubtoken')]) 
 				{
                   sh '''
-                    git config user.email "adarsh@gmail.com"
-                    git config user.name "adarsh"
+                    git config user.email "lohithtallapudi909@gmail.com"
+                    git config user.name "lohitht909"
                     BUILD_NUMBER=${BUILD_NUMBER}
                    #sed -i "s/mc:.*/mc:${BUILD_NUMBER}/g" deploymentfiles/deployment.yml
-					sed -i "s|image: .*|image: 526344317172.dkr.ecr.us-east-1.amazonaws.com/nodejs:$BUILD_NUMBER|" deploymentfiles/deployment.yml
+					sed -i "s|image: .*|image: 483176634994.dkr.ecr.us-east-1.amazonaws.com/nodejs:$BUILD_NUMBER|" deploymentfiles/deployment.yml
                     git add .
                     
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
